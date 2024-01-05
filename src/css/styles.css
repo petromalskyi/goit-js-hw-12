@@ -54,7 +54,6 @@ button:hover {
 }
 
 .loader {
-  margin-top: 100px;
   margin-left: auto;
   margin-right: auto;
   width: 48px;
@@ -76,4 +75,14 @@ button:hover {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.js-btn-load {
+  margin: 32px auto;
+  display: block;
+  width: 125px;
+  height: 40px;
+}
+.hidden {
+  display: none;
 }

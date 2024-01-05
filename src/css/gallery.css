@@ -1,8 +1,8 @@
+
 .gallery {
   display: grid;
-  max-width: 1128px;
-  grid-template-columns: repeat(3, 360px);
-  /* grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); */
+  max-width: 1246px;
+  grid-template-columns: repeat(5, 360px);
   grid-auto-rows: 230px;
   grid-gap: 24px;
   justify-content: center;
@@ -59,7 +59,7 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  font-size: 12px;
+  font-size: 14px;
   width: 100%;
   background-color: #fff;
   border-right: 1px solid #c7c2c2;
