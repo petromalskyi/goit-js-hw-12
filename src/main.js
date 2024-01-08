@@ -4,17 +4,24 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import axios from 'axios';
 
-const formEl = document.querySelector('form');
-const listEl = document.querySelector('.gallery');
-const loadMoreEl = document.querySelector('.js-btn-load');
+const queryElements = {
+  formEl: document.querySelector('form'),
+  listEl: document.querySelector('.gallery'),
+  loadMoreEl: document.querySelector('.js-btn-load'),
+  loaderEl: document.querySelector('.loader'),
+};
 
-const perPage = 40;
-let userEntered = '';
-let currentPage = 1;
-let loaderEl = '';
+const variables = {
+  perPage: 40,
+  userEntered: '',
+  currentPage: 1,
+  messageError: '',
+  messageWarning: '',
+};
 
-formEl.addEventListener('submit', handleSubmit);
-loadMoreEl.addEventListener('click', onLoadMore);
+queryElements.formEl.addEventListener('submit', handleSubmit);
+
+queryElements.loadMoreEl.addEventListener('click', onLoadMore);
 
 const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
@@ -23,55 +30,50 @@ const lightbox = new SimpleLightbox('.gallery a', {
 });
 
 async function onLoadMore() {
-  currentPage += 1;
-  loadMoreEl.classList.toggle('hidden');
-  loadMoreEl.insertAdjacentHTML('afterend', '<span class="loader"></span>');
-  loaderEl = document.querySelector('.loader');
+  variables.currentPage += 1;
+  queryElements.loadMoreEl.classList.toggle('hidden');
+  queryElements.loaderEl.classList.remove('hidden');
 
-  try {
-    const data = await getGallery(userEntered);
-    if (!data.hits.length) {
-      iziToastError();
-      return;
-    } else {
-      if (data.totalHits - (currentPage - 1) * perPage <= perPage) {
-        iziToastWarning();
-      } else {
-        loadMoreEl.classList.remove('hidden');
-      }
-    }
-
-    return createMarkup(data.hits);
-  } catch (error) {
-    console.log(error);
-  }
+  tryCatch();
 }
 
 async function handleSubmit(event) {
   event.preventDefault();
-  listEl.innerHTML = '';
-  currentPage = 1;
-  userEntered = event.currentTarget.elements.name.value;
+  variables.currentPage = 1;
 
-  loadMoreEl.insertAdjacentHTML('afterend', '<span class="loader"></span>');
-  loaderEl = document.querySelector('.loader');
+  queryElements.loaderEl.classList.remove('hidden');
 
+  queryElements.listEl.innerHTML = '';
+  variables.userEntered = event.currentTarget.elements.name.value;
+
+  tryCatch();
+
+  event.currentTarget.elements.name.value = '';
+}
+
+async function tryCatch() {
   try {
-    const data = await getGallery(userEntered);
+    const data = await getGallery(variables.userEntered);
+
     if (!data.hits.length) {
+      variables.messageError =
+        'Sorry, there are no images matching your search query. Please try again!';
       iziToastError();
       return;
+    }
+
+    if (data.totalHits / (variables.perPage * variables.currentPage) <= 1) {
+      variables.messageWarning =
+        "We're sorry, but you've reached the end of search results.";
+      iziToastWarning();
     } else {
-      if (data.totalHits - (currentPage - 1) * perPage <= perPage) {
-        iziToastWarning();
-      } else {
-        loadMoreEl.classList.remove('hidden');
-      }
+      queryElements.loadMoreEl.classList.remove('hidden');
     }
 
     return createMarkup(data.hits);
   } catch (error) {
-    console.log(error);
+    variables.messageError = error;
+    iziToastError();
   }
 }
 
@@ -80,9 +82,8 @@ async function getGallery(userEntered) {
   axios.defaults.baseURL = 'https://pixabay.com/api';
 
   const response = await axios.get(
-    `/?key=${API_KEY}&q=${userEntered}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${perPage}&page=${currentPage}`,
+    `/?key=${API_KEY}&q=${variables.userEntered}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${variables.perPage}&page=${variables.currentPage}`,
   );
-
   return response.data;
 }
 
@@ -126,30 +127,26 @@ function createMarkup(array) {
     '',
   );
 
-  listEl.insertAdjacentHTML('beforeend', markup);
+  queryElements.listEl.insertAdjacentHTML('beforeend', markup);
 
   lightbox.refresh();
 
-  if (loaderEl) {
-    loaderEl.remove();
-  }
+  queryElements.loaderEl.classList.add('hidden');
 
   window.scrollBy({
-    top: listEl.getBoundingClientRect().height,
+    top: queryElements.listEl.getBoundingClientRect().height,
     left: 0,
     behavior: 'smooth',
   });
 }
 
 function iziToastError() {
-  loadMoreEl.classList.add('hidden');
-  if (loaderEl) {
-    loaderEl.remove();
-  }
+  queryElements.loadMoreEl.classList.add('hidden');
+  queryElements.loaderEl.classList.add('hidden');
+
   iziToast.error({
     title: 'Error',
-    message:
-      'Sorry, there are no images matching your search query. Please try again!',
+    message: variables.messageError,
     position: 'topRight',
     messageColor: '#ffffff',
     titleColor: '#ffffff',
@@ -159,13 +156,12 @@ function iziToastError() {
 }
 
 function iziToastWarning() {
-  loadMoreEl.classList.add('hidden');
-  if (loaderEl) {
-    loaderEl.remove();
-  }
+  queryElements.loadMoreEl.classList.add('hidden');
+  queryElements.loaderEl.classList.add('hidden');
+
   iziToast.warning({
     title: 'Caution',
-    message: "We're sorry, but you've reached the end of search results.",
+    message: variables.messageWarning,
     position: 'topRight',
     messageColor: '#000000',
     titleColor: '#000000',
