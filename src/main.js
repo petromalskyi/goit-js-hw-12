@@ -39,12 +39,28 @@ async function onLoadMore() {
 
 async function handleSubmit(event) {
   event.preventDefault();
+
+  variables.userEntered = event.currentTarget.elements.name.value.trim();
+
+  if (variables.userEntered === '') {
+    event.currentTarget.elements.name.value = '';
+    variables.messageWarning = 'Enter some value in this field.';
+    iziToastWarning();
+    return;
+  }
+
   variables.currentPage = 1;
 
   queryElements.loaderEl.classList.remove('hidden');
 
-  queryElements.listEl.innerHTML = '';
-  variables.userEntered = event.currentTarget.elements.name.value;
+  //queryElements.listEl.innerHTML = '';
+  const arrChildNodes = Array.from(queryElements.listEl.childNodes);
+  if (arrChildNodes.length) {
+    for (const arr of arrChildNodes) {
+      arr.remove();
+    }
+  }
+  console.log(queryElements.listEl.childNodes);
 
   tryCatch();
 
