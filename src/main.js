@@ -43,9 +43,9 @@ async function handleSubmit(event) {
   variables.userEntered = event.currentTarget.elements.name.value.trim();
 
   if (variables.userEntered === '') {
-    event.currentTarget.elements.name.value = '';
-    variables.messageWarning = 'Enter some value in this field.';
-    iziToastWarning();
+    queryElements.formEl.reset();
+    variables.messageError = 'Sorry, enter some value in this field.';
+    iziToastError();
     return;
   }
 
@@ -56,15 +56,12 @@ async function handleSubmit(event) {
   //queryElements.listEl.innerHTML = '';
   const arrChildNodes = Array.from(queryElements.listEl.childNodes);
   if (arrChildNodes.length) {
-    for (const arr of arrChildNodes) {
-      arr.remove();
-    }
+    arrChildNodes.forEach(arr => arr.remove());
   }
-  console.log(queryElements.listEl.childNodes);
 
   tryCatch();
 
-  event.currentTarget.elements.name.value = '';
+  queryElements.formEl.reset();
 }
 
 async function tryCatch() {
