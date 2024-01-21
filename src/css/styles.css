@@ -16,6 +16,13 @@
   height: 40px;
   font-family: 'Montserrat';
   font-size: 16;
+  @media (max-width: 420px) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 input {

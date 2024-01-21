@@ -50,10 +50,9 @@ async function handleSubmit(event) {
   }
 
   variables.currentPage = 1;
-
   queryElements.loaderEl.classList.remove('hidden');
 
-  //queryElements.listEl.innerHTML = '';
+  // queryElements.listEl.innerHTML = '';
   const arrChildNodes = Array.from(queryElements.listEl.childNodes);
   if (arrChildNodes.length) {
     arrChildNodes.forEach(arr => arr.remove());
@@ -92,13 +91,22 @@ async function tryCatch() {
 
 async function getGallery(userEntered) {
   const API_KEY = '41437501-0a58a7d6f9b55a91ef815cfe0';
-  axios.defaults.baseURL = 'https://pixabay.com/api';
+  axios.defaults.baseURL = 'https://pixabay.com/api/';
+  const params = {
+    q: `${variables.userEntered}`,
+    image_type: 'photo',
+    orientation: 'horizontal',
+    safesearch: 'true',
+    per_page: `${variables.perPage}`,
+    page: `${variables.currentPage}`,
+  };
 
-  const response = await axios.get(
-    `/?key=${API_KEY}&q=${variables.userEntered}&image_type=photo&orientation=horizontal&safesearch=true&per_page=${variables.perPage}&page=${variables.currentPage}`,
-  );
+  const response = await axios.get(`?key=${API_KEY}`, { params });
+
   return response.data;
 }
+
+//   width="360" height="200"
 
 function createMarkup(array) {
   const markup = array.reduce(
@@ -114,8 +122,7 @@ function createMarkup(array) {
             class="gallery-image"
             src="${webformatURL}"
             alt="${tags}"
-            width="360"
-            height="200"
+          
             />
             <div class="gallery-info">
               <div class="gallery-box">
