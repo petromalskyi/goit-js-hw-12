@@ -17,6 +17,7 @@
   font-family: 'Montserrat';
   font-size: 16;
   @media (max-width: 420px) {
+    width: 320px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -53,6 +54,10 @@ button {
   border-radius: 8px;
   border: none;
   font-family: inherit;
+  @media (max-width: 420px) {
+    height: 40px;
+    padding: 8px 16px;
+  }
 }
 
 button:hover {
